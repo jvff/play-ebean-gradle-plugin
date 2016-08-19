@@ -1,0 +1,34 @@
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile 'org.avaje.ebeanorm:avaje-ebeanorm-agent:8.1.1'
+    compile 'org.ow2.asm:asm:5.1'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.janitovff'
+            artifactId 'play-ebean-gradle-plugin'
+            version '0.0.1'
+
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url "/localm2/"
+        }
+    }
+}
