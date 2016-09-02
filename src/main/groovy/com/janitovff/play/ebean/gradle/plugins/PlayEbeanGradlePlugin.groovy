@@ -43,6 +43,11 @@ class PlayEbeanGradlePlugin implements Plugin<Project> {
 
             sourceSet.getSource().srcDirs = javaSourceSet.getSource().srcDirs
             sourceSet.getSource().include("models/**/*.java")
+
+            String playJavaDependency = 'com.typesafe.play:play-java_2.11:2.3.9'
+
+            sourceSet.dependencies.module 'org.avaje.ebean:ebean:8.2.3'
+            sourceSet.dependencies.module playJavaDependency
         }
 
         @Mutate
