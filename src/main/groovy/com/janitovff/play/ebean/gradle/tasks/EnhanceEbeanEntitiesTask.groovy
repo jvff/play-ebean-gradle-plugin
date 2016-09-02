@@ -52,7 +52,6 @@ class EnhanceEbeanEntitiesTask extends DefaultTask {
     }
 
     private void enhanceFile(File file) {
-        System.err.println("Enhancing: " + file)
         try {
             String className = getClassName(file)
             byte[] transformedBytes = enhanceClass(file, className)
