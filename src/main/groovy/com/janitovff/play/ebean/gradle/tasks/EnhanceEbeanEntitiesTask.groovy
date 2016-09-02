@@ -70,7 +70,7 @@ class EnhanceEbeanEntitiesTask extends DefaultTask {
         def classLoader = getClass().getClassLoader()
         def classStream = new FileInputStream(classFile)
         def classReader = new ClassPathClassBytesReader(new URL[0])
-        def transformer = new Transformer(new URL[0], "debug=9")
+        def transformer = new Transformer(new URL[0], "debug=0")
         def transform = new InputStreamTransform(transformer, classLoader)
 
         try {
