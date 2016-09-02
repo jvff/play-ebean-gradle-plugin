@@ -1,5 +1,6 @@
 package com.janitovff.play.ebean.gradle.plugins
 
+import org.gradle.api.file.FileCollection
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -77,8 +78,22 @@ class PlayEbeanGradlePlugin implements Plugin<Project> {
                         EnhanceEbeanEntitiesTask enhanceTask,
                 @Path("tasks.compileEbeanEntitiesJarEbeanEntitiesJava")
                         Task compileTask) {
+            FileCollection compiledFiles = compileTask.outputs.getFiles()
+
             enhanceTask.dependsOn(compileTask)
-            enhanceTask.inputFiles = compileTask.outputs.getFiles()
+            enhanceTask.inputFiles = compiledFiles
+            enhanceTask.outputDirectory = getEnhancedClassesDir(compiledFiles)
+        }
+
+        private File getEnhancedClassesDir(FileCollection inputFiles) {
+            for (File file : inputFiles) {
+                if (file.toString().contains("classes"))
+                    return getEnhancedClassesDirUsing(file.toString())
+            }
+        }
+
+        private File getEnhancedClassesDirUsing(String path) {
+            return new File(path.replaceFirst("classes", "enhancedClasses"))
         }
 
         @Mutate
