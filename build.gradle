@@ -4,6 +4,7 @@ plugins {
 
     id 'org.ajoberstar.grgit' version '1.5.1'
     id 'org.ajoberstar.release-opinion' version '1.5.1'
+    id 'com.gradle.plugin-publish' version '0.9.5'
 }
 
 repositories {
@@ -18,17 +19,30 @@ dependencies {
     compile 'org.ow2.asm:asm:5.1'
 }
 
+group = 'com.janitovff'
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId 'com.janitovff'
-            artifactId 'play-ebean-gradle-plugin'
-
             from components.java
         }
     }
 
     repositories {
         mavenLocal()
+    }
+}
+
+pluginBundle {
+    website = 'http://github.com/jvff/play-ebean-gradle-plugin'
+    vcsUrl = 'http://github.com/jvff/play-ebean-gradle-plugin'
+    description = 'Enhance Ebean entities for use with Play! framework'
+    tags = ['ebean', 'play']
+
+    plugins {
+        playEbeanPlugin {
+            id = 'com.janitovff.play-ebean'
+            displayName = 'Play Ebean Gradle plugin'
+        }
     }
 }
