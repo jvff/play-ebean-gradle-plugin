@@ -5,6 +5,9 @@ import java.nio.file.Files
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.incremental.IncrementalTaskInputs
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 import com.avaje.ebean.enhance.agent.ClassPathClassBytesReader
@@ -16,17 +19,27 @@ import org.objectweb.asm.ClassReader
 import com.janitovff.play.ebean.gradle.internal.ClassNameExtractor
 
 class EnhanceEbeanEntitiesTask extends DefaultTask {
+    @InputFiles
     FileCollection inputFiles
+
+    @OutputDirectory
     File outputDirectory
 
     @TaskAction
-    void enhance() {
-        for (File file : inputFiles) {
-            enhancePath(file)
+    void enhance(IncrementalTaskInputs inputs) {
+        if (!inputs.incremental)
+            project.delete(outputDirectory.listFiles())
+
+        inputs.outOfDate { change ->
+            this.enhancePath(change.file)
+        }
+
+        inputs.removed { change ->
+            this.removeOutputFileOf(change.file)
         }
     }
 
-    private void enhancePath(File file) {
+    void enhancePath(File file) {
         if (file.isFile())
             enhanceFile(file)
         else if (file.isDirectory())
