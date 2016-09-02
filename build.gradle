@@ -1,6 +1,9 @@
 plugins {
     id 'groovy'
     id 'maven-publish'
+
+    id 'org.ajoberstar.grgit' version '1.5.1'
+    id 'org.ajoberstar.release-opinion' version '1.5.1'
 }
 
 repositories {
@@ -20,7 +23,6 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.janitovff'
             artifactId 'play-ebean-gradle-plugin'
-            version '0.0.1'
 
             from components.java
         }
