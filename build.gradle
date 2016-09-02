@@ -11,7 +11,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile 'org.avaje.ebeanorm:avaje-ebeanorm-agent:8.1.1'
+    compile 'org.avaje.ebean:ebean-agent:8.1.1'
     compile 'org.ow2.asm:asm:5.1'
 }
 
@@ -27,8 +27,6 @@ publishing {
     }
 
     repositories {
-        maven {
-            url "/localm2/"
-        }
+        mavenLocal()
     }
 }
