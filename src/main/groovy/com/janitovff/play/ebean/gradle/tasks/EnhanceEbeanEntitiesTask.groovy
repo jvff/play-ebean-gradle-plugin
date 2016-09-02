@@ -51,15 +51,15 @@ class EnhanceEbeanEntitiesTask extends DefaultTask {
     private void enhanceClass(File classFile) throws IOException {
         def className = getClassName(classFile)
         def classLoader = getClass().getClassLoader()
+        def classStream = new FileInputStream(classFile)
         def classReader = new ClassPathClassBytesReader(new URL[0])
         def transformer = new Transformer(new URL[0], "debug=9")
         def transform = new InputStreamTransform(transformer, classLoader)
 
-        System.err.println("enhanceClass(" + classFile + ")")
-        System.err.println("class name: " + className)
-
-        classFile.withInputStream { inputStream ->
-            return transform.transform(className, inputStream)
+        try {
+            return transform.transform(className, classStream)
+        } finally {
+            classStream.close()
         }
     }
 
