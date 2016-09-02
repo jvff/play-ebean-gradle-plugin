@@ -7,6 +7,7 @@ import org.gradle.api.Task
 import org.gradle.jvm.plugins.JvmComponentPlugin
 import org.gradle.jvm.JarBinarySpec
 import org.gradle.jvm.JvmLibrarySpec
+import org.gradle.jvm.tasks.Jar
 import org.gradle.language.java.JavaSourceSet
 import org.gradle.language.scala.tasks.PlatformScalaCompile
 import org.gradle.model.Each
@@ -59,16 +60,8 @@ class PlayEbeanGradlePlugin implements Plugin<Project> {
         }
 
         @Mutate
-        void addDependencyToScalaCompileTask(@Each PlatformScalaCompile task,
-                @Path("components.ebeanEntities.binaries.jar")
-                        JarBinarySpec jar) {
-            jar.tasks.all {
-                task.classpath += it.outputs.getFiles()
-            }
-        }
-
-        @Mutate
-        void createTaskToEnhanceClasses(ModelMap<Task> tasks) {
+        void createTaskToEnhanceClasses(ModelMap<Task> tasks,
+                PlayPluginConfigurations configurations) {
             tasks.create("enhanceEbeanEntities", EnhanceEbeanEntitiesTask)
         }
 
@@ -97,10 +90,34 @@ class PlayEbeanGradlePlugin implements Plugin<Project> {
         }
 
         @Mutate
-        void hookBuildJarTaskToEnhancedClasses(
-                @Path("tasks.createEbeanEntitiesJar") Task jarTask,
-                @Path("tasks.enhanceEbeanEntities") Task enhanceTask) {
-            jarTask.dependsOn(enhanceTask)
+        void createTaskToCreateEnhancedJar(ModelMap<Task> tasks) {
+            tasks.create("createEnhancedEbeanEntitiesJar", Jar)
+        }
+
+        @Mutate
+        void configureTaskToCreateEnhancedJar(
+                @Path("tasks.createEnhancedEbeanEntitiesJar")
+                        Jar enhancedJarTask,
+                @Path("tasks.createEbeanEntitiesJar") Jar jarTask,
+                @Path("tasks.enhanceEbeanEntities")
+                        EnhanceEbeanEntitiesTask enhanceTask) {
+            String destinationPath = jarTask.destinationDir.getPath()
+                    .replaceAll("ebeanEntities", "enhancedEbeanEntities")
+            File destinationDir = new File(destinationPath)
+
+            enhancedJarTask.dependsOn(enhanceTask)
+            enhancedJarTask.from(enhanceTask.outputDirectory)
+            enhancedJarTask.destinationDir = destinationDir
+            enhancedJarTask.archiveName = "enhancedEbeanEntities"
+        }
+
+        @Mutate
+        void addEnhancedJarDependencyToPlayConfiguration(
+                @Path("tasks.compilePlayBinaryScala") Task compileTask,
+                @Path("tasks.createEnhancedEbeanEntitiesJar") Jar jarTask,
+                PlayPluginConfigurations configurations) {
+            compileTask.dependsOn(jarTask)
+            configurations.play.addDependency(jarTask.outputs.files)
         }
     }
 }
